@@ -59,6 +59,18 @@
 
 \begin{frame}
   \titlepage
+
+  \begin{center} {\tt http://github.com/hashdist}
+  \end{center}
+~
+
+{\footnotesize
+
+Dag Sverre's work for Simula Innovation is funded by a grant from the \\
+International Research Office, US Army Engineer Research and Development Center
+(BAA contract W911NF-12-1-0604)
+}
+
 \end{frame}
 
 \begin{frame}
@@ -73,21 +85,21 @@
 \uncover<+->{What makes HPC so special?}
   \begin{itemize}
   \item<+-> Only sysadmins have root (so no Debian/Ubuntu, RedHat)
-%    \begin{itemize}
-%    \item others: virtualization
-%    \end{itemize}
+    \begin{itemize}
+    \item others: virtualization
+    \end{itemize}
   \item<+-> Common to compile specifically for CPU for optimal speed
-%    \begin{itemize}
-%    \item others: don't care so much
-%    \end{itemize}
+    \begin{itemize}
+    \item others: don't care so much
+    \end{itemize}
   \item<+-> Users lack computer skills (relative to what they do)
-%    \begin{itemize}
-%    \item others: either performance isn't important, or you own a datacenter with sysadmins
-%    \end{itemize}
+    \begin{itemize}
+    \item others: either performance isn't important, or own a datacenter
+    \end{itemize}
   \item<+-> Fortran compilers from multiple vendors with incompatible ABI
-%    \begin{itemize}
-%    \item others: Fortran unheard of, only one compiler vendor anyway, C ABI standard
-%    \end{itemize}
+    \begin{itemize}
+    \item others: Fortran unheard of, only one compiler vendor anyway, C ABI standard
+    \end{itemize}
 \item<+->
 {\small
   \begin{semiverbatim}
@@ -105,6 +117,17 @@ mvapich-1.2.0-qlc  mvapich2-1.7-qlc  openmpi-1.4.3-qlc
 \end{frame}
 
 
+
+% Definition of circles
+\def\firstcircle{(0,0) circle (2cm)}
+\def\secondcircle{(0:3cm) circle (2cm)}
+
+\colorlet{circle edge}{blue!50}
+\colorlet{circle area}{blue!20}
+
+\tikzset{filled/.style={fill=circle area, draw=circle edge, thick},
+    outline/.style={draw=circle edge, thick}}
+
 \begin{frame}
   \frametitle{Scientific Python}
 
@@ -118,31 +141,50 @@ mvapich-1.2.0-qlc  mvapich2-1.7-qlc  openmpi-1.4.3-qlc
 
   \item<+-> ...while scientific Python really a shell around C, C++, Fortran codes
 
-  \item<+-> Others have great solutions but either HPC-style performance isn't needed (R)
-    or there's less binding to native code (Haskell, Java)
+%  \item<+-> Others have great solutions but either HPC-style performance isn't needed (R)
+%    or there's less binding to native code (Haskell, Java)
 
   \end{itemize}
 
 ~
 
-\uncover<+->{{\bf BONUS:} HPC sysadmins don't care about Python}
+\uncover<+->{
+
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{scope}
+        \clip \firstcircle; \fill[filled] \secondcircle;
+      \end{scope}
+      \draw[outline] \firstcircle node {Python}; \draw[outline]
+      \secondcircle node {HPC}; \node[anchor=south] at (current
+      bounding box.north) {};
+      % \node at (8, 2) {
+      % \begin{minipage}{6cm} {\bf BONUS:} HPC sysadmins don't care
+      %   about Python
+      % \end{minipage}
+      % };
+    \end{tikzpicture}
+  \end{center}
+
+}
 
 \end{frame}
 
 \begin{frame}
-  \frametitle{Existing sophisticated systems}
+  \frametitle{Sophisticated systems}
 
   \begin{itemize}
   \item<+-> Debian/Ubuntu/RedHat/Gentoo: Need root access
   \item<+-> MacPorts etc.: Mac only
   \item<+-> Gentoo Prefix: Experimental
   \item<+-> Grand Unified Builder, 0install: Lack scientific packages
+  \item<+-> Python environment provided by sysadmins: Outdated
   \end{itemize}
 
 \end{frame}
 
 \begin{frame}
-  \frametitle{Existing simple systems}
+  \frametitle{Simple user-space systems}
   Sage, python-hpcmp, dorsal, EasyBuild, Hans Petter's Python script:
 
   \begin{itemize}
@@ -203,7 +245,7 @@ $\times$ Python version $\times$ NumPy version $\times$ FFT library...
   
   \begin{itemize}
   \item<+-> Debian, RedHat, cluster sysadmins, dorsal is all about curated software stacks
-  \item<+-> Typically you want 70\% curated, 20\% bleeding edge, 10\% your own code...
+  \item<+-> Perhaps you want 60\% curated, 20\% bleeding edge or manually configured, 20\% your own code...
   \item<+-> Ubuntu + root access: Make your own PPA
   \item<+-> Build from source
   \item<+-> dorsal, EasyBuild: Contribute your own configuration
@@ -220,23 +262,20 @@ $\times$ Python version $\times$ NumPy version $\times$ FFT library...
   \end{center}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Hashdist}
-
-In order of priority:
-
-  \begin{enumerate}
-  \item<+-> ``Hash-based'' approach (based on ideas in Nix)
-  \item<+-> Deterministic/``functional'' builds
-  \item<+-> Package descriptions built around managing combinatorial explosion
-  \end{enumerate}
-\end{frame}
+% \begin{frame}
+%   \frametitle{Hashdist}
+% In order of priority:
+%   \begin{enumerate}
+%   \item<+-> ``Hash-based'' approach (based on ideas in Nix)
+%   \item<+-> Deterministic/``functional'' builds for improved reproducibility
+%   \item<+-> Managing combinatorial explosion
+%   \end{enumerate}
+% \end{frame}
 
 
 \begin{frame}[fragile]
   \frametitle{Hash-based installation}
 
-  Many different versions can be present (though maybe not used) simultaneously:
   \begin{itemize}
   \item<+-> Linux laptop:
 {\small
@@ -263,8 +302,14 @@ In order of priority:
 ~/.hdist/opt/hdf5/{\color{red}qgpd}/lib/libhdf5.so
 \end{semiverbatim}
 }
-(really {\tt hdf5/efn3i7ni7lbtik4frlb5wcnqgpdmi3ql})
+{\footnotesize (really {\tt hdf5/efn3i7ni7lbtik4frlb5wcnqgpdmi3ql})}
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    (demo)
+  \end{center}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -275,13 +320,13 @@ In order of priority:
 \{ "import" : [\{ "id" : "gcc/apyicmxgafb564zz7rwhwvon7padvxdx"\},
                \{ "id" : "unix/kmbvakqpvmhl65d2unzmjupxjbjkxge2"\},
                \{ "id" : "zlib/wbg27phinbgwjg4nasb4xzf3ypo72otn"\}],
+   "sources" : [\{ "key" : "tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2"\}],
    "script" : [
         ["LDFLAGS=-L$\{ZLIB\}/lib -Wl,-rpath,$\{ZLIB\}/lib"],
-        ["CFLAGS=-I$\{ZLIB\}/include \only<3->{{\color{red}-O0 -g}}"],
+        ["CFLAGS=-I$\{ZLIB\}/include\only<3->{{\color{red} -O0 -g}}"],
         ["./configure", "--prefix=$\{ARTIFACT\}", "--with-pic"]
         ["make"],
         ["make", "install"]]
-   "sources" : [\{ "key" : "tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2"\}]
 \}
 \end{semiverbatim}
 }
@@ -333,13 +378,14 @@ libc.so.6 => /lib/x86\_64-linux-gnu/libc.so.6
 \begin{frame}
   \frametitle{Consequences of hash-based installation}
   \begin{enumerate}
-  \item<+-> More dimensions without\\
+  \item<+-> More dimensions! Even \\
 {\footnotesize
-{\tt .../VERSIONS/h5py-hdf5\_1.8.9\_pgi-python2.7-numpy1.6.3\_debug}
+{\tt .../h5py-hdf5\_1.8.9\_pgi-python2.7-numpy1.6.3\_debug\_ubuntu12.10}
 }
+is not exhaustive; ``{\tt h5py/5ffg...}'' caters for everything
 
   \item<+-> For free: Atomic upgrades
-  \item<+-> Much easier: Uninstall (garbage collection instead of tracking)
+  \item<+-> Much easier: Uninstall (GC rather than file tracking)
   \item<+-> Jump around in software history (or between branches) in seconds!
   \end{enumerate}
 
@@ -357,32 +403,160 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
 
 
 \begin{frame}
-  \frametitle{The tradeoff}
+  \frametitle{The tradeoff: Builds must be ``functional''}
 
   \begin{itemize}
-  \item<+-> {\em All} factors of the build must be explicitly taken into account
-    when describing
+  \item<+-> All dependencies and all of the environment must be
+    taken into account when describing the build
   \item<+-> More hassle, but very good for reproducability
-  \item<+-> Linux only (so far): Hashdist will be able to issue warnings
-    if a build process accesses something it shouldn't
   \end{itemize}
+
+~
+ 
+\uncover<+->{Some help:}
+
+~
+
+\begin{itemize}
+\item<+-> Integrate with host system (Debian, environment modules,
+  ``generic'') to specify dependencies on package on host system
+\item<+-> ``hdist-jail'' can issue warnings if a build process
+  accesses files it shouldn't (or hide them)
+
+\end{itemize}
 
 \end{frame}
 
+%\begin{frame}[fragile]
+%\frametitle{What is Hashdist?}
+%\begin{itemize}
+%\item<+-> One of the goals is to make a reusable {\em core} for hashed-functional builds
+%\item<+-> However, existing packaging systems are not focused on
+%exploring combinatorial explosion
+%\end{itemize}
+%\end{frame}
 
-% \begin{frame}[fragile]
-% \frametitle{Frontend}
-% \begin{semiverbatim}
-% rules:
-%   CFLAGS = ["-g", "-O\$optlevel"]
-%   when recipe=="configure_make_install":
-%     optlevel: 2
-%   when project=="numpy":
-%     recipe: "configure_make_install"
-%     when version==1.5.2:
-%       optlevel: 0
-% \end{semiverbatim}
-% \end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Frontend: Software stack definitions (in progress)}
+Declarative approach (because you can git it and share it):
+
+{\small
+
+\begin{semiverbatim}
+include:
+  - sources # pull in ./sources.yml
+  - build
+  - when cluster == "abel":
+    - abel-overrides
+profiles:
+  - name: "default"
+    configuration:
+      lapack_type: "openblas"
+      cluster: "hexagon"
+    select:
+      - project: "hdf5"
+        version: 1.8.2\only<2>{{\color{red} to 1.8.5 # with integer linear programming}}
+      - project: "h5py"
+        ...
+\end{semiverbatim}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Domain-specific language focused on overrides}
+
+Manage the combinatorial explosion without creating
+packages for {\tt hdf5\_intel\_mpich}, {\tt hdf5\_gcc\_openmpi}, ...:
+{
+
+\begin{semiverbatim}
+rules:
+  ...
+  CFLAGS: ["-g", "-O\$optlevel"]
+  when recipe == "configure-make-install":
+    optlevel: 2
+  when project == "hdf5":
+    recipe: "configure-make-install"
+    when version == 1.5.2:
+      optlevel: 0
+    build_deps:
+      - project: "zlib"
+        version: 1.2.5 to 1.2.7
+  ...
+\end{semiverbatim}
+}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Build description pipeline}
+
+
+Results in a set of attributes per package:
+{\small
+\begin{semiverbatim}
+dict(
+ package='hdf5',
+ version='1.8.10',
+ recipe='configure-make-install',
+ downloads=['http://www.hdfgroup.org/ftp/HDF5/current/'
+            'src/hdf5-1.8.10.tar.bz2'],
+ sources=['tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2'],
+ configure=['--prefix=${ARTIFACT}', '--with-pic'],
+ CFLAGS=['-O2'],
+ jail='warn',
+ build_deps=[zlib, unix, gcc]
+)
+\end{semiverbatim}
+}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Build description pipeline}
+
+Feed it through a Python pipeline:
+{\footnotesize
+
+\begin{semiverbatim}
+@pipeline.add\_recipe('configure-make-install')
+def configure\_make\_install\_recipe(ctx, cfg, build):
+    build['build']['script'].extend([
+        ["LDFLAGS=$(hdist", "build-ldflags", ")"],
+        ["CFLAGS=$(hdist", "build-cflags", ")"],
+        ["CFLAGS+= " + " ".join(cfg.CFLAGS)],
+        ['./configure'] + cfg.configure,
+        ['make'],
+        ['make', 'install']
+        ])
+\end{semiverbatim}
+}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Build description pipeline}
+
+To get build specification:
+{\footnotesize
+
+\begin{semiverbatim}
+\{ "import" : [\{ "id" : "gcc/apyicmxgafb564zz7rwhwvon7padvxdx"\},
+               \{ "id" : "unix/kmbvakqpvmhl65d2unzmjupxjbjkxge2"\},
+               \{ "id" : "zlib/wbg27phinbgwjg4nasb4xzf3ypo72otn"\}],
+   "sources" : [\{ "key" : "tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2"]\},
+   "script" : [
+        ["LDFLAGS=$(hdist", "build-ldflags", ")"],
+        ["CFLAGS=$(hdist", "build-cflags", ")"],
+        ["CFLAGS+= -O2"],
+        ["./configure", "--prefix=$\{ARTIFACT\}"]
+        ["make"],
+        ["make", "install"]]
+\}
+\end{semiverbatim}
+}
+
+\end{frame}
 
 
 \end{document}
