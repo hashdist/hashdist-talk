@@ -1,0 +1,388 @@
+\documentclass[sans,mathserif]{beamer}
+%handout,notes=show
+
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{8 on 1}[a4paper,border shrink=5mm]
+
+\usetheme{default}
+\usepackage{fp}
+\usepackage[thicklines]{cancel}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{ifthen}
+\usepackage{animate}
+\usepackage{setspace}
+\usepackage{forloop}
+\usepackage{tikz}
+
+%\usepackage{concmath}
+%\usepackage{pxfonts}
+%\usepackage{eulervm}
+%\usepackage{mathpazo}
+%\renewcommand\mathfamilydefault{\rmdefault}
+
+%\usefonttheme{professionalfonts}
+%\setmathfont{}
+%\setsansfont{Palatino}
+\usetikzlibrary{arrows,backgrounds,positioning,fit,chains,shapes,calc}
+
+%\usepackage{handoutWithNotes}
+%\pgfpagesuselayout{4 on 1 with notes}[a4paper,border shrink=5mm]
+
+\setbeamertemplate{navigation symbols}{}
+
+\title{Hashdist -- Yet Another Desperate Attempt at Fixing Scientific Software Distribution}
+\author{Dag Sverre Seljebotn\\Ond\v{r}ej \v{C}ert\'{i}k\\Chris Kees}
+%\institute{Department of Mathematics \\ University of Oslo}
+\date{Simula, January 24, 2013}
+
+\newcommand{\V}{\vskip1em}
+
+\setbeamersize{sidebar width left=0cm, sidebar width right=0cm}
+\setbeamersize{text margin left=.8cm, text margin right=.8cm}
+
+\defbeamertemplate{note page}{infolines}
+{%
+  \vskip3em
+%  \setstretch{1.8}
+  \Large
+  \rmfamily
+  \insertnote
+}
+\setbeamertemplate{note page}[infolines]
+
+\renewcommand{\CancelColor}{\color{red}}
+
+\begin{document}
+
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    {\LARGE The Problem}
+  \end{center}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{HPC software distribution}
+\uncover<+->{What makes HPC so special?}
+  \begin{itemize}
+  \item<+-> Only sysadmins have root (so no Debian/Ubuntu, RedHat)
+%    \begin{itemize}
+%    \item others: virtualization
+%    \end{itemize}
+  \item<+-> Common to compile specifically for CPU for optimal speed
+%    \begin{itemize}
+%    \item others: don't care so much
+%    \end{itemize}
+  \item<+-> Users lack computer skills (relative to what they do)
+%    \begin{itemize}
+%    \item others: either performance isn't important, or you own a datacenter with sysadmins
+%    \end{itemize}
+  \item<+-> Fortran compilers from multiple vendors with incompatible ABI
+%    \begin{itemize}
+%    \item others: Fortran unheard of, only one compiler vendor anyway, C ABI standard
+%    \end{itemize}
+\item<+->
+{\small
+  \begin{semiverbatim}
+\$ ls /usr/mpi/*
+/usr/mpi/gcc:
+mvapich-1.2.0  mvapich-1.2.0-qlc  mvapich2-1.7
+mvapich2-1.7-qlc  openmpi-1.4.3  openmpi-1.4.3-qlc
+/usr/mpi/intel:
+mvapich-1.2.0-qlc  mvapich2-1.7-qlc  openmpi-1.4.3-qlc
+/usr/mpi/pgi:
+mvapich-1.2.0-qlc  mvapich2-1.7-qlc  openmpi-1.4.3-qlc
+  \end{semiverbatim}
+}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Scientific Python}
+
+  \begin{itemize}
+  \item<+-> Python applications/scripts have large dependency trees
+    \begin{itemize}
+    \item Really a result of {\em better} software engineering practices...
+    \end{itemize}
+
+  \item<+-> Python packaging created by web developers who mostly write Python and some C...
+
+  \item<+-> ...while scientific Python really a shell around C, C++, Fortran codes
+
+  \item<+-> Others have great solutions but either HPC-style performance isn't needed (R)
+    or there's less binding to native code (Haskell, Java)
+
+  \end{itemize}
+
+~
+
+\uncover<+->{{\bf BONUS:} HPC sysadmins don't care about Python}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Existing sophisticated systems}
+
+  \begin{itemize}
+  \item<+-> Debian/Ubuntu/RedHat/Gentoo: Need root access
+  \item<+-> MacPorts etc.: Mac only
+  \item<+-> Gentoo Prefix: Experimental
+  \item<+-> Grand Unified Builder, 0install: Lack scientific packages
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Existing simple systems}
+  Sage, python-hpcmp, dorsal, EasyBuild, Hans Petter's Python script:
+
+  \begin{itemize}
+  \item<+-> Simple (good) $\Leftrightarrow$ lack features (minor inconvenience)
+  \item<+-> Easy to do oneself $\Rightarrow$ difficult for one to get
+    momentum
+  \item<+-> The details are different for everybody
+   \begin{itemize}
+    \item Best LAPACK for Sage is not best LAPACK for EPD/Anaconda
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Manual builds}
+
+  \begin{itemize}
+  \item<+-> {\tt ./configure -\,{}-prefix=\$HOME/local; make; make install}
+  \item<+->{Or in the case of my home institute,\\
+{\tt export LD\_LIBRARY\_PATH=\textasciitilde{}oldstudent/local/lib}}
+  \end{itemize}
+
+~
+
+\uncover<+->{Some problems:}
+
+\begin{itemize}
+\item<+-> Steep learning curve (and hard-to-find bugs)
+\item<+-> Tedious to move between clusters
+\item<+-> Reproducibility 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The real knot}
+
+Combinatorial explosion:
+
+~
+
+~
+
+\begin{tikzpicture}[scale=3]
+    \draw[thick,->,black] (0,0,0) -- (2,0,0) node[anchor=north east]{Compiler vendor/version};
+    \draw[thick,->] (0,0,0) -- (0,1,0) node[anchor=north east]{MPI};
+    \draw[thick,->] (0,0,0) -- (0,0,1) node[anchor=east]{LAPACK};
+\end{tikzpicture}
+
+~
+
+$\times$ Python version $\times$ NumPy version $\times$ FFT library...
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Curation}
+  
+  \begin{itemize}
+  \item<+-> Debian, RedHat, cluster sysadmins, dorsal is all about curated software stacks
+  \item<+-> Typically you want 70\% curated, 20\% bleeding edge, 10\% your own code...
+  \item<+-> Ubuntu + root access: Make your own PPA
+  \item<+-> Build from source
+  \item<+-> dorsal, EasyBuild: Contribute your own configuration
+    \begin{itemize}
+    \item {\tt dolfin.package} vs. {\tt dolfin-intel.package}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \begin{center}
+    {\LARGE Hashdist}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Hashdist}
+
+In order of priority:
+
+  \begin{enumerate}
+  \item<+-> ``Hash-based'' approach (based on ideas in Nix)
+  \item<+-> Deterministic/``functional'' builds
+  \item<+-> Package descriptions built around managing combinatorial explosion
+  \end{enumerate}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Hash-based installation}
+
+  Many different versions can be present (though maybe not used) simultaneously:
+  \begin{itemize}
+  \item<+-> Linux laptop:
+{\small
+\begin{semiverbatim}
+/usr/lib/libhdf5.so
+\end{semiverbatim}
+}
+  \item<+-> HPC environment modules:
+{\small
+\begin{semiverbatim}
+/cluster/software/VERSIONS/hdf5-1.6.1/lib/libhdf5.so
+/cluster/software/VERSIONS/hdf5-1.6.1_intel/lib/libhdf5.so
+/cluster/software/VERSIONS/hdf5-1.6.1_pgi/lib/libhdf5.so
+/cluster/software/VERSIONS/hdf5-1.8.9/lib/libhdf5.so
+/cluster/software/VERSIONS/hdf5-1.8.9_intel/lib/libhdf5.so
+/cluster/software/VERSIONS/hdf5-1.8.9_pgi/lib/libhdf5.so
+\end{semiverbatim}
+}
+    \item<+-> Hashdist:
+{\small 
+\begin{semiverbatim}
+~/.hdist/opt/hdf5/{\color{red}efn3}/lib/libhdf5.so
+~/.hdist/opt/hdf5/{\color{red}i7ni}/lib/libhdf5.so
+~/.hdist/opt/hdf5/{\color{red}qgpd}/lib/libhdf5.so
+\end{semiverbatim}
+}
+(really {\tt hdf5/efn3i7ni7lbtik4frlb5wcnqgpdmi3ql})
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Using a hash-based software store}
+\uncover<+->{{\bf (1)} Describe the build ({\bf internal protocol!})}
+{\footnotesize
+\begin{semiverbatim}
+\{ "import" : [\{ "id" : "gcc/apyicmxgafb564zz7rwhwvon7padvxdx"\},
+               \{ "id" : "unix/kmbvakqpvmhl65d2unzmjupxjbjkxge2"\},
+               \{ "id" : "zlib/wbg27phinbgwjg4nasb4xzf3ypo72otn"\}],
+   "script" : [
+        ["LDFLAGS=-L$\{ZLIB\}/lib -Wl,-rpath,$\{ZLIB\}/lib"],
+        ["CFLAGS=-I$\{ZLIB\}/include \only<3->{{\color{red}-O0 -g}}"],
+        ["./configure", "--prefix=$\{ARTIFACT\}", "--with-pic"]
+        ["make"],
+        ["make", "install"]]
+   "sources" : [\{ "key" : "tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2"\}]
+\}
+\end{semiverbatim}
+}
+
+~
+
+\uncover<+->{{\bf (2)} Hash the build spec $\rightarrow$
+\only<2>{{\tt \footnotesize hdf5/u4vsabroylchvmwoxf5mdpxidd4lnrwl}}%
+\only<3->{{\color{red} \tt \footnotesize hdf5/fjczhadqtyx6jlbnvzlthrzsex7wz7xb}}
+}
+
+~
+
+\uncover<4->{{\bf (3)} If not found, do an {\em isolated} build on the fly}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Using a hash-based software store}
+{\bf (4)} When all packages are built reate symbolic links to
+  package contents in a {\em profile}:
+{
+\footnotesize
+
+\begin{semiverbatim}
+\$ ls -l ~/local
+local -> /home/dagss/.hdist/opt/profile/w6gp
+
+\$ ls -l /home/dagss/.hdist/opt/profile/w6gp/bin
+h5copy -> /home/dagss/.hdist/opt/hdf5/whfk/bin/h5copy
+h5ls -> /home/dagss/.hdist/opt/hdf5/whfk/bin/h5ls
+...
+
+\$ ldd /home/dagss/.hdist/opt/hdf5/whfk/lib/libhdf5.so
+linux-vdso.so.1 => (0x00007fffeb3ff000)
+libsz.so.2 => {\color{red}/home/dagss/.hdist/opt/szip/5a5t/lib/libsz.so.2}
+libz.so.1 => {\color{red}/home/dagss/.hdist/opt/zlib/cll6/lib/libz.so.1}
+libm.so.6 => /lib/x86\_64-linux-gnu/libm.so.6
+libc.so.6 => /lib/x86\_64-linux-gnu/libc.so.6
+/lib64/ld-linux-x86-64.so.2
+\end{semiverbatim}
+}
+  
+\end{frame}
+
+
+
+
+\begin{frame}
+  \frametitle{Consequences of hash-based installation}
+  \begin{enumerate}
+  \item<+-> More dimensions without\\
+{\footnotesize
+{\tt .../VERSIONS/h5py-hdf5\_1.8.9\_pgi-python2.7-numpy1.6.3\_debug}
+}
+
+  \item<+-> For free: Atomic upgrades
+  \item<+-> Much easier: Uninstall (garbage collection instead of tracking)
+  \item<+-> Jump around in software history (or between branches) in seconds!
+  \end{enumerate}
+
+~
+
+\uncover<+->{
+  \begin{center}
+    {\bf Sophisticated features with simple implementation}
+  \end{center}
+~
+
+Prior art: Eelco Dolstra's PhD thesis/the Nix project
+}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{The tradeoff}
+
+  \begin{itemize}
+  \item<+-> {\em All} factors of the build must be explicitly taken into account
+    when describing
+  \item<+-> More hassle, but very good for reproducability
+  \item<+-> Linux only (so far): Hashdist will be able to issue warnings
+    if a build process accesses something it shouldn't
+  \end{itemize}
+
+\end{frame}
+
+
+% \begin{frame}[fragile]
+% \frametitle{Frontend}
+% \begin{semiverbatim}
+% rules:
+%   CFLAGS = ["-g", "-O\$optlevel"]
+%   when recipe=="configure_make_install":
+%     optlevel: 2
+%   when project=="numpy":
+%     recipe: "configure_make_install"
+%     when version==1.5.2:
+%       optlevel: 0
+% \end{semiverbatim}
+% \end{frame}
+
+
+\end{document}
