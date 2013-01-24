@@ -2,7 +2,6 @@
 *.pyo
 *.aux
 *.log
-*.pdf
 *.snm
 *.nav
 *.out

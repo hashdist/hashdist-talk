@@ -90,11 +90,11 @@ International Research Office, US Army Engineer Research and Development Center
     \end{itemize}
   \item<+-> Common to compile specifically for CPU for optimal speed
     \begin{itemize}
-    \item others: don't care so much
+    \item others: either performance isn't important, or own a datacenter
     \end{itemize}
   \item<+-> Users lack computer skills (relative to what they do)
     \begin{itemize}
-    \item others: either performance isn't important, or own a datacenter
+    \item others: do what they're educated for...
     \end{itemize}
   \item<+-> Fortran compilers from multiple vendors with incompatible ABI
     \begin{itemize}
@@ -137,7 +137,9 @@ mvapich-1.2.0-qlc  mvapich2-1.7-qlc  openmpi-1.4.3-qlc
     \item Really a result of {\em better} software engineering practices...
     \end{itemize}
 
-  \item<+-> Python packaging created by web developers who mostly write Python and some C...
+  \item<+-> Scientists must sometimes live on bleeding edge
+
+  \item<+-> Python packaging created by web developers who mostly write Python...
 
   \item<+-> ...while scientific Python really a shell around C, C++, Fortran codes
 
@@ -171,7 +173,7 @@ mvapich-1.2.0-qlc  mvapich2-1.7-qlc  openmpi-1.4.3-qlc
 \end{frame}
 
 \begin{frame}
-  \frametitle{Sophisticated systems}
+  \frametitle{Current options: Sophisticated}
 
   \begin{itemize}
   \item<+-> Debian/Ubuntu/RedHat/Gentoo: Need root access
@@ -184,7 +186,7 @@ mvapich-1.2.0-qlc  mvapich2-1.7-qlc  openmpi-1.4.3-qlc
 \end{frame}
 
 \begin{frame}
-  \frametitle{Simple user-space systems}
+  \frametitle{Current options: Simple user-space}
   Sage, python-hpcmp, dorsal, EasyBuild, Hans Petter's Python script:
 
   \begin{itemize}
@@ -246,13 +248,23 @@ $\times$ Python version $\times$ NumPy version $\times$ FFT library...
   \begin{itemize}
   \item<+-> Debian, RedHat, cluster sysadmins, dorsal is all about curated software stacks
   \item<+-> Perhaps you want 60\% curated, 20\% bleeding edge or manually configured, 20\% your own code...
-  \item<+-> Ubuntu + root access: Make your own PPA
-  \item<+-> Build from source
-  \item<+-> dorsal, EasyBuild: Contribute your own configuration
-    \begin{itemize}
-    \item {\tt dolfin.package} vs. {\tt dolfin-intel.package}
-    \end{itemize}
   \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{What to do?}
+    \begin{itemize}
+    \item<+-> Ubuntu + root access: Make your own PPA
+    \item<+-> Build from source
+      \begin{itemize}
+      \item Often on top of a scientific Python distribution
+      \end{itemize}
+    \item<+-> dorsal, EasyBuild: Contribute your own configuration
+      \begin{itemize}
+      \item {\tt dolfin.package} vs. {\tt dolfin-intel.package}
+      \end{itemize}
+    \end{itemize}
 \end{frame}
 
 
@@ -318,7 +330,7 @@ $\times$ Python version $\times$ NumPy version $\times$ FFT library...
 {\footnotesize
 \begin{semiverbatim}
 \{ "import" : [\{ "id" : "gcc/apyicmxgafb564zz7rwhwvon7padvxdx"\},
-               \{ "id" : "unix/kmbvakqpvmhl65d2unzmjupxjbjkxge2"\},
+               \{ "id" : "virtual:unix"\},
                \{ "id" : "zlib/wbg27phinbgwjg4nasb4xzf3ypo72otn"\}],
    "sources" : [\{ "key" : "tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2"\}],
    "script" : [
@@ -346,7 +358,7 @@ $\times$ Python version $\times$ NumPy version $\times$ FFT library...
 
 \begin{frame}[fragile]
   \frametitle{Using a hash-based software store}
-{\bf (4)} When all packages are built reate symbolic links to
+{\bf (4)} When all packages are built create symbolic links to
   package contents in a {\em profile}:
 {
 \footnotesize
@@ -375,7 +387,7 @@ libc.so.6 => /lib/x86\_64-linux-gnu/libc.so.6
 
 
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Consequences of hash-based installation}
   \begin{enumerate}
   \item<+-> More dimensions! Even \\
@@ -385,8 +397,16 @@ libc.so.6 => /lib/x86\_64-linux-gnu/libc.so.6
 is not exhaustive; ``{\tt h5py/5ffg...}'' caters for everything
 
   \item<+-> For free: Atomic upgrades
+\begin{semiverbatim}
+\$ hdist upgrade
+# ...then power shuts down, but you're good
+\end{semiverbatim}
+
   \item<+-> Much easier: Uninstall (GC rather than file tracking)
+
   \item<+-> Jump around in software history (or between branches) in seconds!
+
+
   \end{enumerate}
 
 ~
@@ -401,6 +421,46 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
 }
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Branchable software stack}
+
+\begin{itemize}
+\item<+->
+\begin{semiverbatim}
+\textasciitilde{}/mystack \$ ls
+default.yml sources.yml build.yml abel-cluster.yml
+\end{semiverbatim}
+
+\item<+->
+\begin{semiverbatim}
+\textasciitilde{}/mystack \$ git checkout cuttingedge
+\textasciitilde{}/mystack \$ # make some modification
+\textasciitilde{}/mystack \$ hdist shell . # slight pause
+\textasciitilde{}/mystack \$ python --version
+Python 2.7.3
+\end{semiverbatim}
+
+\item<+->
+\begin{semiverbatim}
+\textasciitilde{}/mystack \$ \^{}D
+\textasciitilde{}/mystack \$ git checkout paper-from-2010
+\textasciitilde{}/mystack \$ hdist shell . # instant
+\textasciitilde{}/mystack \$ python --version
+Python 2.6.3
+\end{semiverbatim}
+
+\item<+->
+\begin{semiverbatim}
+\textasciitilde{}/mystack \$ rm -rf \textasciitilde{}/.hdist/opt/*
+\textasciitilde{}/mystack \$ hdist shell . # takes quite some time
+\textasciitilde{}/mystack \$ python --version
+Python 2.6.3
+\end{semiverbatim}
+\end{itemize}
+
+
+\end{frame}
+
 
 \begin{frame}
   \frametitle{The tradeoff: Builds must be ``functional''}
@@ -408,7 +468,7 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
   \begin{itemize}
   \item<+-> All dependencies and all of the environment must be
     taken into account when describing the build
-  \item<+-> More hassle, but very good for reproducability
+  \item<+-> More hassle, but very good for reproducibility
   \end{itemize}
 
 ~
@@ -438,7 +498,7 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
 
 
 \begin{frame}[fragile]
-\frametitle{Frontend: Software stack definitions (in progress)}
+\frametitle{User-facing software stack definitions}
 Declarative approach (because you can git it and share it):
 
 {\small
@@ -464,7 +524,7 @@ profiles:
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Domain-specific language focused on overrides}
+\frametitle{For stack developers: DSL focused on overrides}
 
 Manage the combinatorial explosion without creating
 packages for {\tt hdf5\_intel\_mpich}, {\tt hdf5\_gcc\_openmpi}, ...:
@@ -489,10 +549,8 @@ rules:
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Build description pipeline}
+  \frametitle{Temporary internal representation in Hashdist}
 
-
-Results in a set of attributes per package:
 {\small
 \begin{semiverbatim}
 dict(
@@ -513,7 +571,7 @@ dict(
 
 
 \begin{frame}[fragile]
-  \frametitle{Build description pipeline}
+  \frametitle{For Hashdist developers}
 
 Feed it through a Python pipeline:
 {\footnotesize
@@ -535,14 +593,13 @@ def configure\_make\_install\_recipe(ctx, cfg, build):
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Build description pipeline}
+  \frametitle{Generated, read by Hashdist developers while debugging}
 
-To get build specification:
 {\footnotesize
 
 \begin{semiverbatim}
 \{ "import" : [\{ "id" : "gcc/apyicmxgafb564zz7rwhwvon7padvxdx"\},
-               \{ "id" : "unix/kmbvakqpvmhl65d2unzmjupxjbjkxge2"\},
+               \{ "id" : "virtual:unix"\},
                \{ "id" : "zlib/wbg27phinbgwjg4nasb4xzf3ypo72otn"\}],
    "sources" : [\{ "key" : "tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2"]\},
    "script" : [
