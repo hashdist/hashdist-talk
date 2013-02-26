@@ -73,171 +73,103 @@ International Research Office, US Army Engineer Research and Development Center
 
 \end{frame}
 
-\begin{frame}
-  \begin{center}
-    {\LARGE The Problem}
-  \end{center}
-\end{frame}
 
+\begin{frame}
+  \frametitle{It's 2013, and most of the installation world is better off than 10 years ago}
+
+  \begin{itemize}
+    \item<+-> Debian/RedHat
+    \item<+-> App stores
+    \item<+-> Web apps
+  \end{itemize}
+\end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{HPC software distribution}
-\uncover<+->{What makes HPC so special?}
+  \frametitle{What makes scientific codes so special?}
+
   \begin{itemize}
-  \item<+-> Only sysadmins have root (so no Debian/Ubuntu, RedHat)
-    \begin{itemize}
-    \item others: virtualization
-    \end{itemize}
-  \item<+-> Common to compile specifically for CPU for optimal speed
-    \begin{itemize}
-    \item others: either performance isn't important, or own a datacenter
-    \end{itemize}
-  \item<+-> Users lack computer skills (relative to what they do)
-    \begin{itemize}
-    \item others: do what they're educated for...
-    \end{itemize}
-  \item<+-> Fortran compilers from multiple vendors with incompatible ABI
-    \begin{itemize}
-    \item others: Fortran unheard of, only one compiler vendor anyway, C ABI standard
-    \end{itemize}
-\item<+->
-{\small
-  \begin{semiverbatim}
-\$ ls /usr/mpi/*
-/usr/mpi/gcc:
-mvapich-1.2.0  mvapich-1.2.0-qlc  mvapich2-1.7
-mvapich2-1.7-qlc  openmpi-1.4.3  openmpi-1.4.3-qlc
-/usr/mpi/intel:
-mvapich-1.2.0-qlc  mvapich2-1.7-qlc  openmpi-1.4.3-qlc
-/usr/mpi/pgi:
-mvapich-1.2.0-qlc  mvapich2-1.7-qlc  openmpi-1.4.3-qlc
-  \end{semiverbatim}
-}
-\end{itemize}
+    \item<+-> No root access
+    \item<+-> Sometimes you {\bf need} the very latest version
+    \item<+-> Fortran/C++ instead of C/Java/.NET
+    \item<+-> Intersection of ``need speed'' and ``do not pay dedicated application sysadmins''
+  \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{Combinatorial explosion}
 
+\uncover<+->{
+\small {\tt
 
-% Definition of circles
-\def\firstcircle{(0,0) circle (2cm)}
-\def\secondcircle{(0:3cm) circle (2cm)}
-
-\colorlet{circle edge}{blue!50}
-\colorlet{circle area}{blue!20}
-
-\tikzset{filled/.style={fill=circle area, draw=circle edge, thick},
-    outline/.style={draw=circle edge, thick}}
-
-\begin{frame}
-  \frametitle{Scientific Python}
-
-  \begin{itemize}
-  \item<+-> Python applications/scripts have large dependency trees
-    \begin{itemize}
-    \item Really a result of {\em better} software engineering practices...
-    \end{itemize}
-
-  \item<+-> Scientists must sometimes live on bleeding edge
-
-  \item<+-> Python packaging created by web developers who mostly write Python...
-
-  \item<+-> ...while scientific Python really a shell around C, C++, Fortran codes
-
-%  \item<+-> Others have great solutions but either HPC-style performance isn't needed (R)
-%    or there's less binding to native code (Haskell, Java)
-
-  \end{itemize}
+/cluster/software/VERSIONS/hdf5-1.6.1/lib/libhdf5.so \\
+/cluster/software/VERSIONS/hdf5-1.6.1\_intel/lib/libhdf5.so \\
+/cluster/software/VERSIONS/hdf5-1.6.1\_pgi/lib/libhdf5.so \\
+/cluster/software/VERSIONS/hdf5-1.8.9/lib/libhdf5.so \\
+/cluster/software/VERSIONS/hdf5-1.8.9\_intel/lib/libhdf5.so \\
+/cluster/software/VERSIONS/hdf5-1.8.9\_pgi/lib/libhdf5.so \\
+}}
 
 ~
 
 \uncover<+->{
-
-  \begin{center}
-    \begin{tikzpicture}
-      \begin{scope}
-        \clip \firstcircle; \fill[filled] \secondcircle;
-      \end{scope}
-      \draw[outline] \firstcircle node {Python}; \draw[outline]
-      \secondcircle node {HPC}; \node[anchor=south] at (current
-      bounding box.north) {};
-      % \node at (8, 2) {
-      % \begin{minipage}{6cm} {\bf BONUS:} HPC sysadmins don't care
-      %   about Python
-      % \end{minipage}
-      % };
-    \end{tikzpicture}
-  \end{center}
-
-}
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{Current options: Sophisticated}
-
-  \begin{itemize}
-  \item<+-> Debian/Ubuntu/RedHat/Gentoo: Need root access
-  \item<+-> MacPorts etc.: Mac only
-  \item<+-> Gentoo Prefix: Experimental
-  \item<+-> Grand Unified Builder, 0install: Lack scientific packages
-  \item<+-> Python environment provided by sysadmins: Outdated
-  \end{itemize}
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{Current options: Simple user-space}
-  Sage, python-hpcmp, dorsal, EasyBuild, Hans Petter's Python script:
-
-  \begin{itemize}
-  \item<+-> Simple (good) $\Leftrightarrow$ lack features (minor inconvenience)
-  \item<+-> Easy to do oneself $\Rightarrow$ difficult for one to get
-    momentum
-  \item<+-> The details are different for everybody
-   \begin{itemize}
-    \item Best LAPACK for Sage is not best LAPACK for EPD/Anaconda
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Manual builds}
-
-  \begin{itemize}
-  \item<+-> {\tt ./configure -\,{}-prefix=\$HOME/local; make; make install}
-  \item<+->{Or in the case of my home institute,\\
-{\tt export LD\_LIBRARY\_PATH=\textasciitilde{}oldstudent/local/lib}}
-  \end{itemize}
-
-~
-
-\uncover<+->{Some problems:}
-
-\begin{itemize}
-\item<+-> Steep learning curve (and hard-to-find bugs)
-\item<+-> Tedious to move between clusters
-\item<+-> Reproducibility 
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{The real knot}
-
-Combinatorial explosion:
-
-~
-
-~
-
-\begin{tikzpicture}[scale=3]
-    \draw[thick,->,black] (0,0,0) -- (2,0,0) node[anchor=north east]{Compiler vendor/version};
-    \draw[thick,->] (0,0,0) -- (0,1,0) node[anchor=north east]{MPI};
-    \draw[thick,->] (0,0,0) -- (0,0,1) node[anchor=east]{LAPACK};
+\begin{tikzpicture}[scale=2]
+    \draw[thick,->,black] (0,0,0) -- (2,0,0) node[anchor=north east]{\small Compiler vendor/version};
+    \draw[thick,->] (0,0,0) -- (0,1,0) node[anchor=north east]{\small MPI};
+    \draw[thick,->] (0,0,0) -- (0,0,1) node[anchor=east]{\small Package version};
 \end{tikzpicture}
 
 ~
 
-$\times$ Python version $\times$ NumPy version $\times$ FFT library...
+$\times$ LAPACK $\times$ FFT library $\times$ IDL/Python version...
+}
+
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Established options elsewhere}
+
+  \begin{itemize}
+  \item<+-> Debian/Ubuntu/RedHat/Gentoo
+    \begin{itemize}
+    \item Need root
+    \item Deals poorly with combinatorial explosion
+    \end{itemize}
+  \item<+-> MacPorts, Fink
+    \begin{itemize}
+    \item Mac only
+    \item Deals ``not good enough'' with combinatorial explosion
+    \end{itemize}
+  \item<+-> HPC environment modules
+    \begin{itemize}
+    \item The sysadmins hate them
+    \item The users need newer/their own libraries
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Current solutions}
+  \begin{itemize}
+  \item<+-> Build yourself from source
+    \begin{itemize}
+    \item<+-> {\tt ./configure -\,{}-prefix=\$HOME/local; make; make install}
+    \item<+-> {\tt export LD\_LIBRARY\_PATH=\textasciitilde{}sigurdkn/local/lib}
+    \item<+-> Fragile, duplication of work...
+    \end{itemize}
+  \item<+-> Aha! Make a script to build from source...
+    \begin{itemize}
+    \item Simula: dorsal
+    \item 5 different within DoD (incl. python-hpcmp)
+    \item Sage
+    \item Lots of others (``everybody'' does it)
+    \end{itemize}
+  \item<+-> Easy to do oneself $\Rightarrow$ difficult for one to get
+    momentum
+  \item<+-> The details are different for everybody
+  \end{itemize}
 
 \end{frame}
 
@@ -247,43 +179,160 @@ $\times$ Python version $\times$ NumPy version $\times$ FFT library...
   
   \begin{itemize}
   \item<+-> Debian, RedHat, cluster sysadmins, dorsal is all about curated software stacks
-  \item<+-> Perhaps you want 60\% curated, 20\% bleeding edge or manually configured, 20\% your own code...
+  \item<+-> Perhaps you want 60\% curated, 20\% bleeding edge or manually tweaked, 20\% your own code...
   \end{itemize}
 \end{frame}
 
 
 \begin{frame}
-  \frametitle{What to do?}
-    \begin{itemize}
-    \item<+-> Ubuntu + root access: Make your own PPA
-    \item<+-> Build from source
-      \begin{itemize}
-      \item Often on top of a scientific Python distribution
-      \end{itemize}
-    \item<+-> dorsal, EasyBuild: Contribute your own configuration
-      \begin{itemize}
-      \item {\tt dolfin.package} vs. {\tt dolfin-intel.package}
-      \end{itemize}
-    \end{itemize}
+  \begin{itemize}
+  \item<+-> Others have failed, we're trying yet again
+  \item<+-> Need to have new ideas
+  \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \begin{center}
+    {\Large Theory}
+  \end{center}
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Hash function}
+  {\Large
+\[ h(k) : \mathbb{N} \to \mathbf{H} \]
+}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Digression -- $O(1)$ hash table table lookups}
+
+
+\uncover<+->{
+  \begin{center}
+    \includegraphics[width=.8\textwidth]{hashtable.png}
+  \end{center}
+}
+
+\uncover<+->{
+If you know contents up front: Create {\em perfect} $h$
+}
+
+~
+
+\uncover<+->{
+{$h$ should be very fast; don't care so much about properties}
+
+{\small Image: Hopgood (1968), Computer Bulletin}
+}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Cryptographic/secure hashing}
+
+  \begin{itemize}
+  \item<+-> Large key size (160, 256, or 512 bits)
+    \begin{itemize}
+    \item NIST standards: SHA-1, SHA-2 (224, 256, 384, 512 bits), SHA-3
+    \end{itemize}
+  \item<+-> Mathematical research topic to make $h$ such that no
+    information about input is revealed
+  \end{itemize}
+
+~
+
+\uncover<+->{
+\small
+\only<3>{$h$({\tt 'The dark fox'}) = $h$({\tt 546865206461726b20666f78} hex) \\
+\quad  = {\tt b6589fc6ab0dc82cf12099d1c2d40ab994e8410c} hex}
+\only<4>{$h$({\tt 'The dark fog'}) = $h$({\tt 546865206461726b20666f67} hex) \\
+\quad  = {\tt da4b9237bacccdf19c0760cab7aec4a8359010b0} hex}%
+}
+
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example 1: Store passwords}
+
+Use the one-way nature
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example 2: git}
+~
+
+\only<1>{
+
+\tt
+\$ (cd code/hashdist/.git/objects; find)
+./59/5a2f8e3890d0ece24514f3e32ae874f1f03ac2 \\
+./2f/780151688e1f122a5b9072d42009c80c36140c \\
+./2f/4b2eef40b51bc2d46027d1864653b37dd05f8f \\
+./2f/237d74e3f81f498212629ac0b96bedac4b0b36 \\
+./2f/dff799c54fed6fe96a91e1d5f1593996228ebc \\
+./2f/27bd4efa5f8521fb98eb82181a67aae97b7f1a \\
+./2f/3fedf882f1b28905199961356f4e00281ddf76 \\
+}
+\only<2->{
+  \begin{center}
+    \includegraphics[width=.8\textwidth]{githashes.png}
+  \end{center}
+}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Why hashes?}
+  \begin{itemize}
+  \item<+-> Incremental database IDs don't work for distributed systems
+  \item<+-> Random ID's would work...
+    \begin{itemize}
+    \item E.g., UUID like {\tt 550e8400-e29b-41d4-a716-446655440000}
+    \end{itemize}
+  \item<+-> ...but a hash simultaneously verifies the content!
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{github-screendump.png}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Chances of collision...}
+\uncover<+->{
+Types of attack (assume $k=160$):
+
+\begin{itemize}
+  \item<+-> Preimage attack: Chance $2^{-160} \sim 10^{-50}$
+  \item<+-> Accidental collision: May happen in a collection of $2^{80} \sim 10^{25}$
+    keys due to ``birthday paradox''
+    \begin{itemize}
+    \item 6.5 billion programmers...
+    \item ...each produce one Linux kernel history every second...
+    \item ...and push to one enourmous Git repsitory...
+    \item ...then after 5 years there's a 50\% chance of collision
+    \end{itemize}
+  \item<+-> Brute-force SHA-1 still needs only $2^{60}$ operations due to weaknesses
+in SHA-1
+\begin{itemize}
+\item \$2.5M today, \$50K after 2020.
+\end{itemize}
+\end{itemize}
+}
+\end{frame}
 
 \begin{frame}
   \begin{center}
     {\LARGE Hashdist}
   \end{center}
 \end{frame}
-
-% \begin{frame}
-%   \frametitle{Hashdist}
-% In order of priority:
-%   \begin{enumerate}
-%   \item<+-> ``Hash-based'' approach (based on ideas in Nix)
-%   \item<+-> Deterministic/``functional'' builds for improved reproducibility
-%   \item<+-> Managing combinatorial explosion
-%   \end{enumerate}
-% \end{frame}
-
 
 \begin{frame}[fragile]
   \frametitle{Hash-based installation}
@@ -305,86 +354,142 @@ $\times$ Python version $\times$ NumPy version $\times$ FFT library...
 /cluster/software/VERSIONS/hdf5-1.8.9_intel/lib/libhdf5.so
 /cluster/software/VERSIONS/hdf5-1.8.9_pgi/lib/libhdf5.so
 \end{semiverbatim}
+
+  \begin{itemize}
+  \item<+-> Even {\tt
+      h5py-hdf5\_1.8.9\_pgi-python2.7-numpy1.6.3\_abel\_debug}
+    incomplete
+  \item<+-> Abel is new and small; US Army clusters have 20-30 versions of every package.
+  \end{itemize}
 }
     \item<+-> Hashdist:
 {\small 
 \begin{semiverbatim}
-~/.hdist/opt/hdf5/{\color{red}efn3}/lib/libhdf5.so
-~/.hdist/opt/hdf5/{\color{red}i7ni}/lib/libhdf5.so
-~/.hdist/opt/hdf5/{\color{red}qgpd}/lib/libhdf5.so
+~/.hit/opt/hdf5/{\color{red}efn3}/lib/libhdf5.so
+~/.hit/opt/hdf5/{\color{red}i7ni}/lib/libhdf5.so
+~/.hit/opt/hdf5/{\color{red}qgpd}/lib/libhdf5.so
 \end{semiverbatim}
 }
 {\footnotesize (really {\tt hdf5/efn3i7ni7lbtik4frlb5wcnqgpdmi3ql})}
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \begin{center}
-    (demo)
-  \end{center}
-\end{frame}
-
 \begin{frame}[fragile]
-  \frametitle{Using a hash-based software store}
-\uncover<+->{{\bf (1)} Describe the build ({\bf internal protocol!})}
+  \frametitle{Step 1: Hash the build}
+\uncover<+->{{\bf Internal protocol!}}
 {\footnotesize
 \begin{semiverbatim}
-\{ "import" : [\{ "id" : "gcc/apyicmxgafb564zz7rwhwvon7padvxdx"\},
-               \{ "id" : "virtual:unix"\},
+\{
+   "name": "hdf5",
+   "import" : [\{ "id" : "gcc/apyicmxgafb564zz7rwhwvon7padvxdx"\},
+               \{ "id" : "unix/v-1"\},
                \{ "id" : "zlib/wbg27phinbgwjg4nasb4xzf3ypo72otn"\}],
    "sources" : [\{ "key" : "tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2"\}],
-   "script" : [
-        ["LDFLAGS=-L$\{ZLIB\}/lib -Wl,-rpath,$\{ZLIB\}/lib"],
-        ["CFLAGS=-I$\{ZLIB\}/include\only<3->{{\color{red} -O0 -g}}"],
-        ["./configure", "--prefix=$\{ARTIFACT\}", "--with-pic"]
-        ["make"],
-        ["make", "install"]]
+   "cmd": ["sh", "$in0"],
+   "inputs": [
+       {"text": [
+            ["./configure --prefix=$\{ARTIFACT\} --with-pic \\\\"],
+            ["    --with-zlib=$ZLIB\only<3->{{\color{red} CFLAGS=-O0}}"],
+            ["make"],
+            ["make", "install"]
+        ]}]
 \}
 \end{semiverbatim}
 }
 
 ~
 
-\uncover<+->{{\bf (2)} Hash the build spec $\rightarrow$
+\uncover<+->{Hash to create key $\rightarrow$
 \only<2>{{\tt \footnotesize hdf5/u4vsabroylchvmwoxf5mdpxidd4lnrwl}}%
 \only<3->{{\color{red} \tt \footnotesize hdf5/fjczhadqtyx6jlbnvzlthrzsex7wz7xb}}
 }
 
-~
-
-\uncover<4->{{\bf (3)} If not found, do an {\em isolated} build on the fly}
-
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Using a hash-based software store}
-{\bf (4)} When all packages are built create symbolic links to
-  package contents in a {\em profile}:
-{
-\footnotesize
+  \frametitle{Step 2: Every build installs to separate location}
+Same as with the ``module load`` system:
 
 \begin{semiverbatim}
-\$ ls -l ~/local
-local -> /home/dagss/.hdist/opt/profile/w6gp
+\$ echo opt/*/*
+opt/hdf5/avnj opt/hdf5/a5df opt/hdf5/a4sf opt/python/arxd
+opt/python/rvdo opt/readline/6vvu  opt/readline/v7fw
+opt/zlib/fh7n  opt/zlib/i7yr ...
 
-\$ ls -l /home/dagss/.hdist/opt/profile/w6gp/bin
-h5copy -> /home/dagss/.hdist/opt/hdf5/whfk/bin/h5copy
-h5ls -> /home/dagss/.hdist/opt/hdf5/whfk/bin/h5ls
-...
+\$ ls opt/zlib/fh7n/lib
+libz.a  libz.so  libz.so.1  libz.so.1.2.5  pkgconfig
 
-\$ ldd /home/dagss/.hdist/opt/hdf5/whfk/lib/libhdf5.so
-linux-vdso.so.1 => (0x00007fffeb3ff000)
-libsz.so.2 => {\color{red}/home/dagss/.hdist/opt/szip/5a5t/lib/libsz.so.2}
-libz.so.1 => {\color{red}/home/dagss/.hdist/opt/zlib/cll6/lib/libz.so.1}
-libm.so.6 => /lib/x86\_64-linux-gnu/libm.so.6
-libc.so.6 => /lib/x86\_64-linux-gnu/libc.so.6
-/lib64/ld-linux-x86-64.so.2
+\$ ls opt/hdf5/avnj/lib
+libhdf5.a  libhdf5.so  libhdf5.so.7  libhdf5.so.7.0.4
 \end{semiverbatim}
-}
-  
+\end{frame}
+
+%\begin{frame}[fragile]
+%  \frametitle{Step 2: Every build installs to separate location}
+%Unlike ``module load`` we don't need LD\_LIBRARY\_PATH:
+%\begin{semiverbatim}
+%\$ ldd opt/hdf5/avnj/lib/libhdf5.so
+%  linux-vdso.so.1 =>  (0x00007fff54b7a000)
+%  libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0
+%  libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6
+%  libz.so.1 => ${ORIGIN}/../../../zlib/fh7n/libz.so.1
+%  libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6
+%  /lib64/ld-linux-x86-64.so.2
+%\end{semiverbatim}
+%\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Step 3: Make a profile with links}
+\begin{semiverbatim}
+\$ ls -la opt/profile/ldhn/bin
+h5dump -> ../../../hdf5/avnj/bin/h5dump
+h5import -> ../../../hdf5/avnj/bin/h5import
+h5ls -> ../../../hdf5/avnj/bin/h5ls
+...
+\end{semiverbatim}
 \end{frame}
 
 
+\begin{frame}[fragile]
+\frametitle{Branchable software stack}
+
+\begin{itemize}
+\item<+->
+\begin{semiverbatim}
+\textasciitilde{}/mystack \$ ls
+default.yml sources.yml build.yml abel-cluster.yml
+\end{semiverbatim}
+
+\item<+->
+\begin{semiverbatim}
+\textasciitilde{}/mystack \$ hit update # takes some time
+\textasciitilde{}/mystack \$ ~/local/bin/python --version
+Python 2.7.2
+\end{semiverbatim}
+\item<+->
+\begin{semiverbatim}
+\textasciitilde{}/mystack \$ hit update # instant
+\end{semiverbatim}
+
+\item<+->
+\begin{semiverbatim}
+\textasciitilde{}/mystack \$ git fetch from-someone-else
+\textasciitilde{}/mystack \$ git checkout someone-elses-branch
+\textasciitilde{}/mystack \$ hit update # pause for extra builds
+\textasciitilde{}/mystack \$ ~/local/bin/python --version
+Python 2.7.3
+\end{semiverbatim}
+
+\item<+->
+\begin{semiverbatim}
+\textasciitilde{}/mystack \$ git checkout paper-from-2010
+\textasciitilde{}/mystack \$ hit update # instant
+\textasciitilde{}/mystack \$ ~/local/bin/python --version
+Python 2.6.3
+\end{semiverbatim}
+\end{itemize}
+\end{frame}
 
 
 \begin{frame}[fragile]
@@ -398,11 +503,11 @@ is not exhaustive; ``{\tt h5py/5ffg...}'' caters for everything
 
   \item<+-> For free: Atomic upgrades
 \begin{semiverbatim}
-\$ hdist upgrade
+\$ hit upgrade
 # ...then power shuts down, but you're good
 \end{semiverbatim}
 
-  \item<+-> Much easier: Uninstall (GC rather than file tracking)
+  \item<+-> Much easier: Uninstall (mark\&sweep rather than file tracking)
 
   \item<+-> Jump around in software history (or between branches) in seconds!
 
@@ -421,81 +526,66 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
 }
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{Branchable software stack}
+\begin{frame}
+  \frametitle{Ideas for autumn}
 
-\begin{itemize}
-\item<+->
-\begin{semiverbatim}
-\textasciitilde{}/mystack \$ ls
-default.yml sources.yml build.yml abel-cluster.yml
-\end{semiverbatim}
-
-\item<+->
-\begin{semiverbatim}
-\textasciitilde{}/mystack \$ git checkout cuttingedge
-\textasciitilde{}/mystack \$ # make some modification
-\textasciitilde{}/mystack \$ hdist shell . # slight pause
-\textasciitilde{}/mystack \$ python --version
-Python 2.7.3
-\end{semiverbatim}
-
-\item<+->
-\begin{semiverbatim}
-\textasciitilde{}/mystack \$ \^{}D
-\textasciitilde{}/mystack \$ git checkout paper-from-2010
-\textasciitilde{}/mystack \$ hdist shell . # instant
-\textasciitilde{}/mystack \$ python --version
-Python 2.6.3
-\end{semiverbatim}
-
-\item<+->
-\begin{semiverbatim}
-\textasciitilde{}/mystack \$ rm -rf \textasciitilde{}/.hdist/opt/*
-\textasciitilde{}/mystack \$ hdist shell . # takes quite some time
-\textasciitilde{}/mystack \$ python --version
-Python 2.6.3
-\end{semiverbatim}
-\end{itemize}
-
+  \begin{itemize}
+  \item<+-> Specifying the entire software stack in minute detail is bothersome
+  \item<+-> Want a constraint solver
+    \begin{itemize}
+    \item A[version$\ge$2] needs B[version$\ge$1.2]
+    \item B[version$\ge$1.1] needs LAPACK=intel-mkl
+    \item Given constraints, which LAPACK and which version of A, B
+    \end{itemize}
+  \item<+-> Debian does constraint solving between packages
+    \begin{itemize}
+    \item But we have $\prod_{i\in\{\text{MPI},\text{compiler},...\}} n_i$ possible ``packages''
+    \end{itemize}
+  \item<+-> We want to do constraint solving on input variables to the build
+  \item<+-> Objective function: Miminimize build time or maximize package freshness?
+  \item<+-> NP-complete problem, e.g.:
+    \begin{itemize}
+    \item Integer linear programming
+    \item Belief propagation (from Bayesian network theory)
+    \end{itemize}
+  \end{itemize}
 
 \end{frame}
 
+\begin{frame}
+  \frametitle{Why bother?}
+
+  \begin{itemize}
+  \item<+-> Leaving build input variables free (e.g., LAPACK)
+    allows ``re-seating'' a software stack description from one system
+    to another
+  \item<+-> Small step towards the ``reproducible paper''
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    {\Large The end}
+  \end{center}
+\end{frame}
 
 \begin{frame}
   \frametitle{The tradeoff: Builds must be ``functional''}
-
   \begin{itemize}
   \item<+-> All dependencies and all of the environment must be
     taken into account when describing the build
   \item<+-> More hassle, but very good for reproducibility
   \end{itemize}
-
 ~
- 
 \uncover<+->{Some help:}
-
 ~
-
 \begin{itemize}
 \item<+-> Integrate with host system (Debian, environment modules,
   ``generic'') to specify dependencies on package on host system
 \item<+-> ``hdist-jail'' can issue warnings if a build process
   accesses files it shouldn't (or hide them)
-
 \end{itemize}
-
 \end{frame}
-
-%\begin{frame}[fragile]
-%\frametitle{What is Hashdist?}
-%\begin{itemize}
-%\item<+-> One of the goals is to make a reusable {\em core} for hashed-functional builds
-%\item<+-> However, existing packaging systems are not focused on
-%exploring combinatorial explosion
-%\end{itemize}
-%\end{frame}
-
 
 \begin{frame}[fragile]
 \frametitle{User-facing software stack definitions}
