@@ -33,9 +33,9 @@
 \setbeamertemplate{navigation symbols}{}
 
 \title{Hashdist -- Yet Another Desperate Attempt at Fixing Scientific Software Distribution}
-\author{Dag Sverre Seljebotn\\Ond\v{r}ej \v{C}ert\'{i}k\\Chris Kees}
+\author{Dag Sverre Seljebotn (Simula Innovation AS)\\Ond\v{r}ej \v{C}ert\'{i}k (U. of Texas, TACC)\\Chris Kees (US Army ERDC)}
 %\institute{Department of Mathematics \\ University of Oslo}
-\date{Simula, January 24, 2013}
+\date{ITA, February 27, 2013}
 
 \newcommand{\V}{\vskip1em}
 
@@ -75,12 +75,34 @@ International Research Office, US Army Engineer Research and Development Center
 
 
 \begin{frame}
-  \frametitle{It's 2013, and most of the installation world is better off than 10 years ago}
+  \frametitle{Rest of the world in 2013...}
 
   \begin{itemize}
     \item<+-> Debian/RedHat
     \item<+-> App stores
     \item<+-> Web apps
+    \item<+-> Libraries for business \& web: Smaller and smaller
+      \begin{itemize}
+        \item<+-> Treshold for sharing something smaller
+        \item<+-> a) git and GitHub, b) Google and Twitter et al.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Scientific code}
+  \begin{itemize}
+  \item<+-> Dependencies are bad: Hard to build, move between clusters
+  \item<+-> Dependencies are good: Can build on works of others
+  \item<+-> Often happens: ``Large frameworks'' bundling things together
+    \begin{itemize}
+    \item<+-> PETSc and Trilinos for solving PDEs
+    \item<+-> Smaller example: Fortran HEALPix incl. Gaussian RNG
+      \begin{itemize}
+      \item What if you want inverse-Gamma RNG?
+      \end{itemize}
+    \item<+-> As soon as you want to push boundaries there's a lot of dirty work ahead
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -133,18 +155,18 @@ $\times$ LAPACK $\times$ FFT library $\times$ IDL/Python version...
   \begin{itemize}
   \item<+-> Debian/Ubuntu/RedHat/Gentoo
     \begin{itemize}
-    \item Need root
-    \item Deals poorly with combinatorial explosion
+    \item<+-> Need root
+    \item<+-> Deals poorly with combinatorial explosion
     \end{itemize}
   \item<+-> MacPorts, Fink
     \begin{itemize}
-    \item Mac only
-    \item Deals ``not good enough'' with combinatorial explosion
+    \item<+-> Mac only
+    \item<+-> Deals ``not good enough'' with combinatorial explosion
     \end{itemize}
   \item<+-> HPC environment modules
     \begin{itemize}
-    \item The sysadmins hate them
-    \item The users need newer/their own libraries
+    \item<+-> The sysadmins hate them
+    \item<+-> The users need newer/their own libraries
     \end{itemize}
   \end{itemize}
 
@@ -389,7 +411,7 @@ in SHA-1
    "inputs": [
        {"text": [
             ["./configure --prefix=$\{ARTIFACT\} --with-pic \\\\"],
-            ["    --with-zlib=$ZLIB\only<3->{{\color{red} CFLAGS=-O0}}"],
+            ["    --with-zlib=$ZLIB\only<3->{{\color{red} CFLAGS='-O0 -g'}}"],
             ["make"],
             ["make", "install"]
         ]}]
@@ -424,19 +446,19 @@ libhdf5.a  libhdf5.so  libhdf5.so.7  libhdf5.so.7.0.4
 \end{semiverbatim}
 \end{frame}
 
-%\begin{frame}[fragile]
-%  \frametitle{Step 2: Every build installs to separate location}
-%Unlike ``module load`` we don't need LD\_LIBRARY\_PATH:
-%\begin{semiverbatim}
-%\$ ldd opt/hdf5/avnj/lib/libhdf5.so
-%  linux-vdso.so.1 =>  (0x00007fff54b7a000)
-%  libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0
-%  libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6
-%  libz.so.1 => ${ORIGIN}/../../../zlib/fh7n/libz.so.1
-%  libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6
-%  /lib64/ld-linux-x86-64.so.2
-%\end{semiverbatim}
-%\end{frame}
+\begin{frame}[fragile]
+  \frametitle{Step 2: Every build installs to separate location}
+Unlike ``module load`` we don't need LD\_LIBRARY\_PATH:
+\begin{semiverbatim}
+\$ ldd opt/hdf5/avnj/lib/libhdf5.so
+  linux-vdso.so.1 =>  (0x00007fff54b7a000)
+  libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0
+  libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6
+  libz.so.1 => ${ORIGIN}/../../../zlib/fh7n/libz.so.1
+  libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6
+  /lib64/ld-linux-x86-64.so.2
+\end{semiverbatim}
+\end{frame}
 
 
 \begin{frame}[fragile]
@@ -526,6 +548,23 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
 }
 \end{frame}
 
+
+\begin{frame}
+  \frametitle{Status}
+  \begin{itemize}
+  \item<+-> Hashdist-as-a-library up and running, lacks user interface
+    \begin{itemize}
+    \item UI = how to describe a ``package''
+    \end{itemize}
+  \item<+-> Starting to use it for ``python-hpcmp'' (US Army PETSc + Python distribution)
+    \begin{itemize}
+    \item Shell scripts and {\tt Makefile}s replaced with Hashdist to provide more features
+    \end{itemize}
+  \item<+-> Up next: Need to provide one (out of many) UI
+  \end{itemize}
+\end{frame}
+
+
 \begin{frame}
   \frametitle{Ideas for autumn}
 
@@ -535,7 +574,7 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
     \begin{itemize}
     \item A[version$\ge$2] needs B[version$\ge$1.2]
     \item B[version$\ge$1.1] needs LAPACK=intel-mkl
-    \item Given constraints, which LAPACK and which version of A, B
+    \item Given constraints, solve for LAPACK-type and A-version, B-version
     \end{itemize}
   \item<+-> Debian does constraint solving between packages
     \begin{itemize}
@@ -543,7 +582,7 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
     \end{itemize}
   \item<+-> We want to do constraint solving on input variables to the build
   \item<+-> Objective function: Miminimize build time or maximize package freshness?
-  \item<+-> NP-complete problem, e.g.:
+  \item<+-> NP-complete problem (``SAT solving''), need heuristics, e.g.:
     \begin{itemize}
     \item Integer linear programming
     \item Belief propagation (from Bayesian network theory)
@@ -562,6 +601,8 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
   \item<+-> Small step towards the ``reproducible paper''
   \end{itemize}
 \end{frame}
+
+
 
 \begin{frame}
   \begin{center}
