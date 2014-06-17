@@ -105,7 +105,9 @@
 \item Proteus toolkit for PDEs was building its own stack with custom scripts, makefiles, and config files
 \item FENICS toolkit  for PDEs had its own system (Dorsal)
 \item Various other DoD groups had their own Python distributions
-\item Could possibly have added to Sage or Enthought distributions but would require many new packages
+\item Could possibly have added to Sage or Enthought distributions but would
+    require many new packages and modifications to reuse ``host`` packages
+    (e.g. vendor MPI)
 \end{itemize}
 \end{frame}
 
@@ -205,13 +207,15 @@ $\times$ LAPACK $\times$ FFT library $\times$ IDL/Python version...
     \begin{itemize}
     \item<+-> {\tt ./configure -\,{}-prefix=\$HOME/local; make; make install}
     \item<+-> {\tt export LD\_LIBRARY\_PATH=\textasciitilde{}sigurdkn/local/lib}
-    \item<+-> Fragile, duplication of work...
+    \item<+-> Fragile, duplication of work, some packages are very difficult to
+        build...
     \end{itemize}
   \item<+-> Aha! Make a script to build from source...
     \begin{itemize}
     \item Simula: dorsal
     \item 5 different within DoD (incl. python-hpcmp)
     \item Sage
+    \item Bilder (\url{http://sourceforge.net/p/bilder/wiki/Home/})
     \item Lots of others (``everybody'' does it)
     \end{itemize}
   \item<+-> Easy to do oneself $\Rightarrow$ difficult for one to get
