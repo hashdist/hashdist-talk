@@ -32,10 +32,10 @@
 
 \setbeamertemplate{navigation symbols}{}
 
-\title{Hashdist -- Yet Another Desperate Attempt at Fixing Scientific Software Distribution}
-\author{Dag Sverre Seljebotn (Simula Innovation AS)\\Ond\v{r}ej \v{C}ert\'{i}k (U. of Texas, TACC)\\Chris Kees (US Army ERDC)}
-%\institute{Department of Mathematics \\ University of Oslo}
-\date{ITA, February 27, 2013}
+\title{Hashdist -- A tool for building and managing your scientific software distribution(s)}
+\author{Chris Kees (US Army ERDC) and the HashDist Developers}
+\institute{Coastal and  Hydraulics Laboratory \\ U.S. Army ERDC}
+\date{Sage Days 58, June 16-20, 2014}
 
 \newcommand{\V}{\vskip1em}
 
@@ -63,30 +63,60 @@
   \begin{center} {\tt http://github.com/hashdist}
   \end{center}
 ~
-
-{\footnotesize
-
-Dag Sverre's work for Simula Innovation is funded by a grant from the \\
-International Research Office, US Army Engineer Research and Development Center
-(BAA contract W911NF-12-1-0604)
-}
-
 \end{frame}
 
+\begin{frame}
+  \frametitle{Acknowledgements}
+\begin{itemize}
+\item Dag Sverre Seljebotn, Ond\v{r}ej \v{C}ert\'{i}k, Aron Ahmadia, Robert Maynord, Jimmy Tang, Lane Wittgen,...
+\item Dag Sverre's work for Simula Innovation was funded by a grant from the International Research Office, US Army Engineer Research and Development Center (BAA contract W911NF-12-1-0604)
+\item Ond\v{r}ej's work for UT was funded by the US Army Engineer Research and Development Center (BAA Contract BAA12-4941) 
+\item Part of Aron's work was supported by the CHL Research Participation Program administered by Oak Ridge Institute for Science and Education
+\end{itemize}
+\end{frame}
 
 \begin{frame}
-  \frametitle{Rest of the world in 2013...}
+\frametitle{What's the problem?}
+\begin{itemize}
+\item<+-> I wrote some math software and I want YOU to use it.
+\item<+-> Problem: My software needs libfoo, which you don't have.
+\item<+-> Problem: My software needs libfoo, which you  DO have in a really weird location.
+\item<+-> Problem: I built my software on an old linux  machine,  you need  it on OS X.
+\item<+-> Problem: You need to run my software on an HPC machine.
+\item<+-> Problem: You don't have  root access to your machine.
+\item<+-> Solution: I need to add my software to a distribution that can handle all these cases.
+\end{itemize}
+\end{frame}
 
+\begin{frame}
+  \frametitle{Rest of the world in 2013, 2014?,...}
   \begin{itemize}
-    \item<+-> Debian/RedHat
-    \item<+-> App stores
-    \item<+-> Web apps
-    \item<+-> Libraries for business \& web: Smaller and smaller
-      \begin{itemize}
-        \item<+-> Treshold for sharing something smaller
-        \item<+-> a) git and GitHub, b) Google and Twitter et al.
-      \end{itemize}
+    \item<+-> Debian/RedHat distributions (linux only)
+    \item<+-> App store (mac only)
+    \item<+-> Web apps (still needs good distribution)
+    \item<+-> Matlab environment (a kind of distribution)
+    \item<+-> Modules on HPC machines.
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Background}
+\begin{itemize}
+\item Proteus toolkit for PDE's was building its own stack with custom scripts, makefiles, and config files
+\item FENICS  toolkit  for PDE's had its own system (Dorsal)
+\item Various other DoD groups had their own Python distributions
+\item Could possibly have added  to sage or enthough distributions but would require many new packages
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Requirments for new system}
+\begin{itemize}
+\item Must support mixing source and ``host'' packages (e.g. vendor MPI)
+\item Must support version control and reproducibility across  users
+\item Must support many kinds of packages (Python, C++, Fortran,...)
+\item Must support needs of developers (building from git repos, trying new packages,...)
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -97,10 +127,6 @@ International Research Office, US Army Engineer Research and Development Center
   \item<+-> Often happens: ``Large frameworks'' bundling things together
     \begin{itemize}
     \item<+-> PETSc and Trilinos for solving PDEs
-    \item<+-> Smaller example: Fortran HEALPix incl. Gaussian RNG
-      \begin{itemize}
-      \item What if you want inverse-Gamma RNG?
-      \end{itemize}
     \item<+-> As soon as you want to push boundaries there's a lot of dirty work ahead
     \end{itemize}
   \end{itemize}
@@ -202,54 +228,30 @@ $\times$ LAPACK $\times$ FFT library $\times$ IDL/Python version...
   \begin{itemize}
   \item<+-> Debian, RedHat, cluster sysadmins, dorsal is all about curated software stacks
   \item<+-> Perhaps you want 60\% curated, 20\% bleeding edge or manually tweaked, 20\% your own code...
-  \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-  \begin{itemize}
-  \item<+-> Others have failed, we're trying yet again
-  \item<+-> Need to have new ideas
+  \item<+-> The community using and supporting a distribution is as  important as  most of the other details. 
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \begin{center}
-    {\Large Theory}
+    {\Large HashDist Theory}
   \end{center}
 \end{frame}
 
-
-
 \begin{frame}
-  \frametitle{Hash function}
-  {\Large
-\[ h(k) : \mathbb{N} \to \mathbf{H} \]
-}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Digression -- $O(1)$ hash table table lookups}
-
-
-\uncover<+->{
-  \begin{center}
-    \includegraphics[width=.8\textwidth]{hashtable.png}
-  \end{center}
-}
-
-\uncover<+->{
-If you know contents up front: Create {\em perfect} $h$
-}
-
-~
-
-\uncover<+->{
-{$h$ should be very fast; don't care so much about properties}
-
-{\small Image: Hopgood (1968), Computer Bulletin}
-}
+\frametitle{Stateful vs. Functional}
+\begin{itemize}
+\item<+-> Our software environment is usually defined by the STATE of the file system
+\item<+-> If I change the source or options for libfoo, then I rebuild
+  it in /usr/lib/libfoo.so.
+\item<+-> Stateful systems are fine when you control everything (a
+  linux distribution, sage distribution)
+\item<+-> An alternative view is to think of the build stage as a
+  mapping from the input  domain (input space $=$ dependency states  $\oplus$ source code states $\oplus$ option states) to a range
+  containing binary ``artifacts'' (output space of ``coordinates'' of unique libfoo.a's).
+\item<+-> Main idea: create build artifact coordinates by hashing the input state and store  the build artifacts in a ``database'' keyed  on those hashes.
+\item<+-> Using the hash idea we can treat package building in a functional manner rather than a stateful manner (idea comes from Eelco Doltstra/Nix)
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -278,14 +280,7 @@ If you know contents up front: Create {\em perfect} $h$
 \end{frame}
 
 \begin{frame}
-  \frametitle{Example 1: Store passwords}
-
-Use the one-way nature
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{Example 2: git}
+  \frametitle{Example: git}
 ~
 
 \only<1>{
@@ -308,46 +303,9 @@ Use the one-way nature
 \end{frame}
 
 \begin{frame}
-  \frametitle{Why hashes?}
-  \begin{itemize}
-  \item<+-> Incremental database IDs don't work for distributed systems
-  \item<+-> Random ID's would work...
-    \begin{itemize}
-    \item E.g., UUID like {\tt 550e8400-e29b-41d4-a716-446655440000}
-    \end{itemize}
-  \item<+-> ...but a hash simultaneously verifies the content!
-  \end{itemize}
-
-\end{frame}
-
-\begin{frame}
   \begin{center}
     \includegraphics[width=.9\textwidth]{github-screendump.png}
   \end{center}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Chances of collision...}
-\uncover<+->{
-Types of attack (assume $k=160$):
-
-\begin{itemize}
-  \item<+-> Preimage attack: Chance $2^{-160} \sim 10^{-50}$
-  \item<+-> Accidental collision: May happen in a collection of $2^{80} \sim 10^{25}$
-    keys due to ``birthday paradox''
-    \begin{itemize}
-    \item 6.5 billion programmers...
-    \item ...each produce one Linux kernel history every second...
-    \item ...and push to one enourmous Git repsitory...
-    \item ...then after 5 years there's a 50\% chance of collision
-    \end{itemize}
-  \item<+-> Brute-force SHA-1 still needs only $2^{60}$ operations due to weaknesses
-in SHA-1
-\begin{itemize}
-\item \$2.5M today, \$50K after 2020.
-\end{itemize}
-\end{itemize}
-}
 \end{frame}
 
 \begin{frame}
@@ -387,12 +345,11 @@ in SHA-1
     \item<+-> Hashdist:
 {\small 
 \begin{semiverbatim}
-~/.hit/opt/hdf5/{\color{red}efn3}/lib/libhdf5.so
-~/.hit/opt/hdf5/{\color{red}i7ni}/lib/libhdf5.so
-~/.hit/opt/hdf5/{\color{red}qgpd}/lib/libhdf5.so
+~/.hashdist/bld/hdf5/pe7l56vsgg43
+~/.hashdist/bld/hdf5/tkiwsppxzc3r
 \end{semiverbatim}
 }
-{\footnotesize (really {\tt hdf5/efn3i7ni7lbtik4frlb5wcnqgpdmi3ql})}
+{\footnotesize (really {\tt hdf5/tkiwsppxzc3ro3q7pyjjxq45jgh3wwcd})}
   \end{itemize}
 \end{frame}
 
@@ -402,19 +359,29 @@ in SHA-1
 {\footnotesize
 \begin{semiverbatim}
 \{
-   "name": "hdf5",
-   "import" : [\{ "id" : "gcc/apyicmxgafb564zz7rwhwvon7padvxdx"\},
-               \{ "id" : "unix/v-1"\},
-               \{ "id" : "zlib/wbg27phinbgwjg4nasb4xzf3ypo72otn"\}],
-   "sources" : [\{ "key" : "tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2"\}],
-   "cmd": ["sh", "$in0"],
-   "inputs": [
-       {"text": [
-            ["./configure --prefix=$\{ARTIFACT\} --with-pic \\\\"],
-            ["    --with-zlib=$ZLIB\only<3->{{\color{red} CFLAGS='-O0 -g'}}"],
-            ["make"],
-            ["make", "install"]
-        ]}]
+  "build" : \{
+    "commands" : [
+      \{
+        "cmd" : [
+          "$BASH", 
+          "\_hashdist/build.sh"
+        ]
+      \}, 
+    ], 
+    "import" : [
+      \{
+        "id" : "zlib/3vq2jgzdjakdhpzvpvtrbzbcrtg6etrh", 
+        "ref" : "ZLIB"
+      \}
+    ]
+  \}, 
+  "name" : "hdf5", 
+  "sources" : [
+    \{
+      "key" : "tar.bz2:l2q3vax4o42q5zriw6k243w6ax7ov4og", 
+      "target" : "."
+    \}
+  ]
 \}
 \end{semiverbatim}
 }
@@ -433,16 +400,15 @@ in SHA-1
 Same as with the ``module load`` system:
 
 \begin{semiverbatim}
-\$ echo opt/*/*
-opt/hdf5/avnj opt/hdf5/a5df opt/hdf5/a4sf opt/python/arxd
-opt/python/rvdo opt/readline/6vvu  opt/readline/v7fw
-opt/zlib/fh7n  opt/zlib/i7yr ...
+\$ echo bld/*/* bld/adh/hwz2wmrcnbj7 bld/adh/lvpjelejrldo
+bld/bzip2/zuo2tlurm7ez bld/cython/bidpqe4yx6gl bld/cython/pbdoyxvljz6u
+bld/cython/xoju62amg7pm bld/daetk/dpoolktbk3si
+bld/docutils/ckp3lhso6vek bld/docutils/uv2667zawv7v
+bld/docutils/yekwczohjna7
 
-\$ ls opt/zlib/fh7n/lib
-libz.a  libz.so  libz.so.1  libz.so.1.2.5  pkgconfig
+\$ ls bld/zmq/x7ogmtwtkola/lib
+pkgconfig  libzmq.a  libzmq.so  libzmq.so.3  libzmq.so.3.0.0
 
-\$ ls opt/hdf5/avnj/lib
-libhdf5.a  libhdf5.so  libhdf5.so.7  libhdf5.so.7.0.4
 \end{semiverbatim}
 \end{frame}
 
@@ -450,13 +416,18 @@ libhdf5.a  libhdf5.so  libhdf5.so.7  libhdf5.so.7.0.4
   \frametitle{Step 2: Every build installs to separate location}
 Unlike ``module load`` we don't need LD\_LIBRARY\_PATH:
 \begin{semiverbatim}
-\$ ldd opt/hdf5/avnj/lib/libhdf5.so
-  linux-vdso.so.1 =>  (0x00007fff54b7a000)
-  libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0
-  libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6
-  libz.so.1 => ${ORIGIN}/../../../zlib/fh7n/libz.so.1
-  libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6
-  /lib64/ld-linux-x86-64.so.2
+\$ ldd bld/hdf5/tkiwsppxzc3r/lib/libhdf5.so
+	linux-vdso.so.1 =>  (0x00007fffe21fe000)
+	libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f9d0d2a4000)
+	libz.so.1 => /home/cekees/.hashdist/bld/zlib/3vq2jgzdjakd/lib/libz.so.1 (0x00007f9d0d08a000)
+	libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f9d0ce86000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f9d0cb80000)
+	libmpich.so.10 => /home/cekees/.hashdist/bld/mpich/4ztabf2u23u2/lib/libmpich.so.10 (0x00007f9d0c71a000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f9d0c354000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f9d0d9dc000)
+	libmpl.so.1 => /home/cekees/.hashdist/bld/mpich/4ztabf2u23u2/lib/libmpl.so.1 (0x00007f9d0c14f000)
+	librt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007f9d0bf46000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f9d0bd30000)
 \end{semiverbatim}
 \end{frame}
 
@@ -464,10 +435,10 @@ Unlike ``module load`` we don't need LD\_LIBRARY\_PATH:
 \begin{frame}[fragile]
 \frametitle{Step 3: Make a profile with links}
 \begin{semiverbatim}
-\$ ls -la opt/profile/ldhn/bin
-h5dump -> ../../../hdf5/avnj/bin/h5dump
-h5import -> ../../../hdf5/avnj/bin/h5import
-h5ls -> ../../../hdf5/avnj/bin/h5ls
+\$ ls -la bld/profile/ycz6e4bztfgd/bin
+bunzip2 -> ../../../bzip2/zuo2tlurm7ez/bin/bunzip2
+bzcat -> ../../../bzip2/zuo2tlurm7ez/bin/bzcat
+bzcmp -> ../../../bzip2/zuo2tlurm7ez/bin/bzcmp
 ...
 \end{semiverbatim}
 \end{frame}
@@ -485,20 +456,20 @@ default.yml sources.yml build.yml abel-cluster.yml
 
 \item<+->
 \begin{semiverbatim}
-\textasciitilde{}/mystack \$ hit update # takes some time
+\textasciitilde{}/mystack \$ hit build # takes some time
 \textasciitilde{}/mystack \$ ~/local/bin/python --version
 Python 2.7.2
 \end{semiverbatim}
 \item<+->
 \begin{semiverbatim}
-\textasciitilde{}/mystack \$ hit update # instant
+\textasciitilde{}/mystack \$ hit build # instant
 \end{semiverbatim}
 
 \item<+->
 \begin{semiverbatim}
 \textasciitilde{}/mystack \$ git fetch from-someone-else
 \textasciitilde{}/mystack \$ git checkout someone-elses-branch
-\textasciitilde{}/mystack \$ hit update # pause for extra builds
+\textasciitilde{}/mystack \$ hit build # pause for extra builds
 \textasciitilde{}/mystack \$ ~/local/bin/python --version
 Python 2.7.3
 \end{semiverbatim}
@@ -506,7 +477,7 @@ Python 2.7.3
 \item<+->
 \begin{semiverbatim}
 \textasciitilde{}/mystack \$ git checkout paper-from-2010
-\textasciitilde{}/mystack \$ hit update # instant
+\textasciitilde{}/mystack \$ hit build # instant
 \textasciitilde{}/mystack \$ ~/local/bin/python --version
 Python 2.6.3
 \end{semiverbatim}
@@ -525,7 +496,7 @@ is not exhaustive; ``{\tt h5py/5ffg...}'' caters for everything
 
   \item<+-> For free: Atomic upgrades
 \begin{semiverbatim}
-\$ hit upgrade
+\$ hit build
 # ...then power shuts down, but you're good
 \end{semiverbatim}
 
@@ -550,200 +521,23 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
 
 
 \begin{frame}
-  \frametitle{Status}
-  \begin{itemize}
-  \item<+-> Hashdist-as-a-library up and running, lacks user interface
-    \begin{itemize}
-    \item UI = how to describe a ``package''
-    \end{itemize}
-  \item<+-> Starting to use it for ``python-hpcmp'' (US Army PETSc + Python distribution)
-    \begin{itemize}
-    \item Shell scripts and {\tt Makefile}s replaced with Hashdist to provide more features
-    \end{itemize}
-  \item<+-> Up next: Need to provide one (out of many) UI
-  \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Ideas for autumn}
-
-  \begin{itemize}
-  \item<+-> Specifying the entire software stack in minute detail is bothersome
-  \item<+-> Want a constraint solver
-    \begin{itemize}
-    \item A[version$\ge$2] needs B[version$\ge$1.2]
-    \item B[version$\ge$1.1] needs LAPACK=intel-mkl
-    \item Given constraints, solve for LAPACK-type and A-version, B-version
-    \end{itemize}
-  \item<+-> Debian does constraint solving between packages
-    \begin{itemize}
-    \item But we have $\prod_{i\in\{\text{MPI},\text{compiler},...\}} n_i$ possible ``packages''
-    \end{itemize}
-  \item<+-> We want to do constraint solving on input variables to the build
-  \item<+-> Objective function: Miminimize build time or maximize package freshness?
-  \item<+-> NP-complete problem (``SAT solving''), need heuristics, e.g.:
-    \begin{itemize}
-    \item Integer linear programming
-    \item Belief propagation (from Bayesian network theory)
-    \end{itemize}
-  \end{itemize}
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{Why bother?}
-
-  \begin{itemize}
-  \item<+-> Leaving build input variables free (e.g., LAPACK)
-    allows ``re-seating'' a software stack description from one system
-    to another
-  \item<+-> Small step towards the ``reproducible paper''
-  \end{itemize}
-\end{frame}
-
-
-
-\begin{frame}
-  \begin{center}
-    {\Large The end}
-  \end{center}
-\end{frame}
-
-\begin{frame}
-  \frametitle{The tradeoff: Builds must be ``functional''}
-  \begin{itemize}
-  \item<+-> All dependencies and all of the environment must be
-    taken into account when describing the build
-  \item<+-> More hassle, but very good for reproducibility
-  \end{itemize}
-~
-\uncover<+->{Some help:}
-~
+\frametitle{Demo}
 \begin{itemize}
-\item<+-> Integrate with host system (Debian, environment modules,
-  ``generic'') to specify dependencies on package on host system
-\item<+-> ``hdist-jail'' can issue warnings if a build process
-  accesses files it shouldn't (or hide them)
+\item Show a stack/distribution profile spec
+\item Show package spec and modify source hash (to build new artifact)
+\item Show package spec and modify build options (to build new artifact)
+\item Revert package spec to show no rebuild occurs
+\item Show 'hit develop' to build a ``virtual  env''
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{User-facing software stack definitions}
-Declarative approach (because you can git it and share it):
-
-{\small
-
-\begin{semiverbatim}
-include:
-  - sources # pull in ./sources.yml
-  - build
-  - when cluster == "abel":
-    - abel-overrides
-profiles:
-  - name: "default"
-    configuration:
-      lapack_type: "openblas"
-      cluster: "hexagon"
-    select:
-      - project: "hdf5"
-        version: 1.8.2\only<2>{{\color{red} to 1.8.5 # with integer linear programming}}
-      - project: "h5py"
-        ...
-\end{semiverbatim}
-}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{For stack developers: DSL focused on overrides}
-
-Manage the combinatorial explosion without creating
-packages for {\tt hdf5\_intel\_mpich}, {\tt hdf5\_gcc\_openmpi}, ...:
-{
-
-\begin{semiverbatim}
-rules:
-  ...
-  CFLAGS: ["-g", "-O\$optlevel"]
-  when recipe == "configure-make-install":
-    optlevel: 2
-  when project == "hdf5":
-    recipe: "configure-make-install"
-    when version == 1.5.2:
-      optlevel: 0
-    build_deps:
-      - project: "zlib"
-        version: 1.2.5 to 1.2.7
-  ...
-\end{semiverbatim}
-}
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Temporary internal representation in Hashdist}
-
-{\small
-\begin{semiverbatim}
-dict(
- package='hdf5',
- version='1.8.10',
- recipe='configure-make-install',
- downloads=['http://www.hdfgroup.org/ftp/HDF5/current/'
-            'src/hdf5-1.8.10.tar.bz2'],
- sources=['tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2'],
- configure=['--prefix=${ARTIFACT}', '--with-pic'],
- CFLAGS=['-O2'],
- jail='warn',
- build_deps=[zlib, unix, gcc]
-)
-\end{semiverbatim}
-}
-\end{frame}
-
-
-\begin{frame}[fragile]
-  \frametitle{For Hashdist developers}
-
-Feed it through a Python pipeline:
-{\footnotesize
-
-\begin{semiverbatim}
-@pipeline.add\_recipe('configure-make-install')
-def configure\_make\_install\_recipe(ctx, cfg, build):
-    build['build']['script'].extend([
-        ["LDFLAGS=$(hdist", "build-ldflags", ")"],
-        ["CFLAGS=$(hdist", "build-cflags", ")"],
-        ["CFLAGS+= " + " ".join(cfg.CFLAGS)],
-        ['./configure'] + cfg.configure,
-        ['make'],
-        ['make', 'install']
-        ])
-\end{semiverbatim}
-}
-
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Generated, read by Hashdist developers while debugging}
-
-{\footnotesize
-
-\begin{semiverbatim}
-\{ "import" : [\{ "id" : "gcc/apyicmxgafb564zz7rwhwvon7padvxdx"\},
-               \{ "id" : "virtual:unix"\},
-               \{ "id" : "zlib/wbg27phinbgwjg4nasb4xzf3ypo72otn"\}],
-   "sources" : [\{ "key" : "tar.bz2:7jxgwn5xs5xnvsdaomvypridodr35or2"]\},
-   "script" : [
-        ["LDFLAGS=$(hdist", "build-ldflags", ")"],
-        ["CFLAGS=$(hdist", "build-cflags", ")"],
-        ["CFLAGS+= -O2"],
-        ["./configure", "--prefix=$\{ARTIFACT\}"]
-        ["make"],
-        ["make", "install"]]
-\}
-\end{semiverbatim}
-}
-
+\begin{frame}
+  \frametitle{Status}
+  \begin{itemize}
+  \item<+-> Hashdist library and command line interface up and running
+  \item<+-> Multiple stacks (proteus,...) across multiple platforms (HPC, linux, OS X, Cygwin)
+  \item<+-> Soon: relocatable builds, ipython notebook integration, flexible constraints
+  \end{itemize}
 \end{frame}
 
 
