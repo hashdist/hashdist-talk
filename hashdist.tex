@@ -68,10 +68,10 @@
 \begin{frame}
   \frametitle{Acknowledgements}
 \begin{itemize}
-\item Dag Sverre Seljebotn, Ond\v{r}ej \v{C}ert\'{i}k, Aron Ahmadia, Robert Maynord, Jimmy Tang, Lane Wittgen,...
+\item Dag Sverre Seljebotn, Ond\v{r}ej \v{C}ert\'{i}k, Aron Ahmadia, Robert Maynard, Jimmy Tang, Lane Wittgen,...
 \item Dag Sverre's work for Simula Innovation was funded by a grant from the International Research Office, US Army Engineer Research and Development Center (BAA contract W911NF-12-1-0604)
 \item Ond\v{r}ej's work for UT was funded by the US Army Engineer Research and Development Center (BAA Contract BAA12-4941) 
-\item Part of Aron's work was supported by the CHL Research Participation Program administered by Oak Ridge Institute for Science and Education
+\item Part of Aron's work was supported by the CHL Research Participation Program administered by the Oak Ridge Institute for Science and Education
 \end{itemize}
 \end{frame}
 
@@ -80,10 +80,10 @@
 \begin{itemize}
 \item<+-> I wrote some math software and I want YOU to use it.
 \item<+-> Problem: My software needs libfoo, which you don't have.
-\item<+-> Problem: My software needs libfoo, which you  DO have in a really weird location.
-\item<+-> Problem: I built my software on an old linux  machine,  you need  it on OS X.
+\item<+-> Problem: My software needs libfoo, which you DO have in a really weird location.
+\item<+-> Problem: I built my software on an old Linux machine, you need it on OS X.
 \item<+-> Problem: You need to run my software on an HPC machine.
-\item<+-> Problem: You don't have  root access to your machine.
+\item<+-> Problem: You don't have root access to your machine.
 \item<+-> Solution: I need to add my software to a distribution that can handle all these cases.
 \end{itemize}
 \end{frame}
@@ -91,10 +91,10 @@
 \begin{frame}
   \frametitle{Rest of the world in 2013, 2014?,...}
   \begin{itemize}
-    \item<+-> Debian/RedHat distributions (linux only)
-    \item<+-> App store (mac only)
+    \item<+-> Debian/RedHat distributions (Linux only)
+    \item<+-> App store (Mac only)
     \item<+-> Web apps (still needs good distribution)
-    \item<+-> Matlab environment (a kind of distribution)
+    \item<+-> MATLAB environment (a kind of distribution)
     \item<+-> Modules on HPC machines.
   \end{itemize}
 \end{frame}
@@ -102,10 +102,10 @@
 \begin{frame}
 \frametitle{Background}
 \begin{itemize}
-\item Proteus toolkit for PDE's was building its own stack with custom scripts, makefiles, and config files
-\item FENICS  toolkit  for PDE's had its own system (Dorsal)
+\item Proteus toolkit for PDEs was building its own stack with custom scripts, makefiles, and config files
+\item FENICS toolkit  for PDEs had its own system (Dorsal)
 \item Various other DoD groups had their own Python distributions
-\item Could possibly have added  to sage or enthough distributions but would require many new packages
+\item Could possibly have added to Sage or Enthought distributions but would require many new packages
 \end{itemize}
 \end{frame}
 
@@ -113,9 +113,9 @@
 \frametitle{Requirments for new system}
 \begin{itemize}
 \item Must support mixing source and ``host'' packages (e.g. vendor MPI)
-\item Must support version control and reproducibility across  users
+\item Must support version control and reproducibility across users
 \item Must support many kinds of packages (Python, C++, Fortran,...)
-\item Must support needs of developers (building from git repos, trying new packages,...)
+\item Must support needs of developers (building from Git repos, trying new packages,...)
 \end{itemize}
 \end{frame}
 
@@ -187,7 +187,7 @@ $\times$ LAPACK $\times$ FFT library $\times$ IDL/Python version...
   \item<+-> MacPorts, Fink
     \begin{itemize}
     \item<+-> Mac only
-    \item<+-> Deals ``not good enough'' with combinatorial explosion
+    \item<+-> Deals ``not well enough'' with combinatorial explosion
     \end{itemize}
   \item<+-> HPC environment modules
     \begin{itemize}
@@ -226,9 +226,9 @@ $\times$ LAPACK $\times$ FFT library $\times$ IDL/Python version...
   \frametitle{Curation}
   
   \begin{itemize}
-  \item<+-> Debian, RedHat, cluster sysadmins, dorsal is all about curated software stacks
+  \item<+-> Debian, RedHat, cluster sysadmins, dorsal are all about curated software stacks
   \item<+-> Perhaps you want 60\% curated, 20\% bleeding edge or manually tweaked, 20\% your own code...
-  \item<+-> The community using and supporting a distribution is as  important as  most of the other details. 
+  \item<+-> The community using and supporting a distribution is as important as most of the other details. 
   \end{itemize}
 \end{frame}
 
@@ -245,11 +245,11 @@ $\times$ LAPACK $\times$ FFT library $\times$ IDL/Python version...
 \item<+-> If I change the source or options for libfoo, then I rebuild
   it in /usr/lib/libfoo.so.
 \item<+-> Stateful systems are fine when you control everything (a
-  linux distribution, sage distribution)
+  Linux distribution, Sage distribution)
 \item<+-> An alternative view is to think of the build stage as a
-  mapping from the input  domain (input space $=$ dependency states  $\oplus$ source code states $\oplus$ option states) to a range
+  mapping from the input domain (input space $=$ dependency states  $\oplus$ source code states $\oplus$ option states) to a range
   containing binary ``artifacts'' (output space of ``coordinates'' of unique libfoo.a's).
-\item<+-> Main idea: create build artifact coordinates by hashing the input state and store  the build artifacts in a ``database'' keyed  on those hashes.
+\item<+-> Main idea: create build artifact coordinates by hashing the input state and store the build artifacts in a ``database'' keyed on those hashes.
 \item<+-> Using the hash idea we can treat package building in a functional manner rather than a stateful manner (idea comes from Eelco Doltstra/Nix)
 \end{itemize}
 \end{frame}
@@ -280,7 +280,7 @@ $\times$ LAPACK $\times$ FFT library $\times$ IDL/Python version...
 \end{frame}
 
 \begin{frame}
-  \frametitle{Example: git}
+  \frametitle{Example: Git}
 ~
 
 \only<1>{
@@ -527,7 +527,7 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
 \item Show package spec and modify source hash (to build new artifact)
 \item Show package spec and modify build options (to build new artifact)
 \item Revert package spec to show no rebuild occurs
-\item Show 'hit develop' to build a ``virtual  env''
+\item Show 'hit develop' to build a ``virtual env''
 \end{itemize}
 \end{frame}
 
@@ -535,8 +535,8 @@ Prior art: Eelco Dolstra's PhD thesis/the Nix project
   \frametitle{Status}
   \begin{itemize}
   \item<+-> Hashdist library and command line interface up and running
-  \item<+-> Multiple stacks (proteus,...) across multiple platforms (HPC, linux, OS X, Cygwin)
-  \item<+-> Soon: relocatable builds, ipython notebook integration, flexible constraints
+  \item<+-> Multiple stacks (Proteus, SciPy Stack, Clawpack) across multiple platforms (HPC, Linux, OS X, Cygwin)
+  \item<+-> Soon: relocatable builds, IPython Notebook integration, flexible constraints
   \end{itemize}
 \end{frame}
 
